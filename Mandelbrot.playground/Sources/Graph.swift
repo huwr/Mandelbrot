@@ -76,31 +76,45 @@ public struct PixelData: CustomStringConvertible {
     }
 }
 
-
-
-
 public struct Graph {
-    private var pixels: [PixelData]
-    var size: CGSize
+    let size: CGSize
+    var length: Int { get { return Int(size.width * size.height) } }
+    let centre: CGPoint
+    let scale: CGFloat
     
-    public init(width: Int, height: Int, predicate: (CGPoint) -> PixelData) {
+    private var pixels: [PixelData]
+    private let predicate: (CGPoint) -> PixelData
+    
+    public init(width: Int, height: Int, predicate: @escaping (CGPoint) -> PixelData) {
         self.init(width: width, height: height,
                   centre: CGPoint(x: 0, y: 0), scale: CGFloat(4),
                   predicate: predicate)
     }
     
-    public init(width: Int, height: Int, centre: CGPoint, scale: CGFloat, predicate: (CGPoint) -> PixelData) {
+    public init(width: Int, height: Int, centre: CGPoint, scale: CGFloat, predicate: @escaping (CGPoint) -> PixelData) {
         size = CGSize(width: width, height: height)
+        self.centre = centre
+        self.scale = scale
+        self.predicate = predicate
         
-        pixels = [PixelData]()
-        
-        for index in 0..<(width * height) {
-            let point = indexToPoint(index, centre: centre, size: size, scale: scale)
-            pixels.append(predicate(point))
-        }
+        pixels = Array<PixelData>(repeating: PixelData.blackPixel(), count: width * height)
     }
     
-    private func indexToPoint(_ index: Int, centre: CGPoint, size: CGSize, scale: CGFloat) -> CGPoint {
+    public mutating func calculateSingleThread() -> UIImage? {
+        for index in 0..<self.length {
+            pixels[index] = predicate(indexToPoint(index))
+        }
+        return self.image
+    }
+    
+    public mutating func calculate() -> UIImage? {
+        DispatchQueue.concurrentPerform(iterations: length) { index in
+            pixels[index] = predicate(indexToPoint(index))
+        }
+        return self.image
+    }
+    
+    private func indexToPoint(_ index: Int) -> CGPoint {
         let aspectRatio = size.height / size.width
         
         var point = CGPoint(
@@ -143,5 +157,15 @@ public struct Graph {
         return UIImage(cgImage: cgimage)
     }
 
+}
+
+public var bigGraph = Graph.init(width: 5000, height: 5000,
+                                        centre: CGPoint(x: -0.7464, y: 0.1101),
+                                        scale: CGFloat(0.0003)
+) { point in
+    return PixelData.gradientPixel(
+        depth: 1 - isMandelbrot(point),
+        start: UIColor.black,
+        finish: UIColor.purple)
 }
 
