@@ -19,21 +19,24 @@ isMandelbrot(CGPoint(x: 0.3, y: 1.0))
  Plain rendering of the whole set.
  */
 
-Graph.init(width: 100, height: 100) { point in
-    return PixelData.greyPixel(greyness: 1 - isMandelbrot(point))
-}.image
+//Graph.init(width: 100, height: 100) { point in
+//    return PixelData.greyPixel(greyness: 1 - isMandelbrot(point))
+//}.image
 
 
 
 /*:
- A very pretty subsection of the graph with special 'cool' pixels.
+ A very pretty subsection of the graph with special colouring. Also available, 'coolPixel', 'greyPixel' and 'gradientPixel'.
  */
 
-Graph.init(width: 100, height: 100,
+Graph.init(width: 5000, height: 5000,
     centre: CGPoint(x: -0.7463, y: 0.1102),
     scale: CGFloat(0.005)
 ) { point in
-    return PixelData.coolPixel(coolness: isMandelbrot(point))
+    return PixelData.gradientPixel(
+        depth: 1 - isMandelbrot(point),
+        start: UIColor.blue,
+        finish: UIColor.orange)
 }.image
 
  

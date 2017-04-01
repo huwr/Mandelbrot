@@ -1,6 +1,6 @@
 import CoreGraphics
 
-let maxIterations = 100
+let maxIterations = 200
 
 public func isMandelbrot(_ point: CGPoint) -> Double {
     let cr = point.x

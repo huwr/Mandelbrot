@@ -1,6 +1,16 @@
 import Foundation
 import UIKit
 
+extension UIColor {
+    var coreImageColor: CIColor {
+        return CIColor(color: self)
+    }
+    var components: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+        let coreImageColor = self.coreImageColor
+        return (coreImageColor.red, coreImageColor.green, coreImageColor.blue, coreImageColor.alpha)
+    }
+}
+
 public struct PixelData: CustomStringConvertible {
     var a: UInt8 = 0
     var r: UInt8 = 0
@@ -36,6 +46,19 @@ public struct PixelData: CustomStringConvertible {
             g: x,
             b: x
         )
+    }
+    
+    private static func interporlate(between start: CGFloat, and end: CGFloat, value: CGFloat) -> UInt8 {
+        let x = (start * value) + (end * (1 - value))
+        return UInt8(x * 255)
+    }
+    
+    public static func gradientPixel(depth: Double, start: UIColor, finish: UIColor) -> PixelData {
+        let r = interporlate(between: start.components.red, and: finish.components.red, value: CGFloat(depth))
+        let g = interporlate(between: start.components.green, and: finish.components.green, value: CGFloat(depth))
+        let b = interporlate(between: start.components.blue, and: finish.components.blue, value: CGFloat(depth))
+        
+        return PixelData.init(a: 255, r: r, g: g, b: b)
     }
     
     public static func coolPixel(coolness: Double) -> PixelData {
