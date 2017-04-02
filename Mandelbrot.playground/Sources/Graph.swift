@@ -1,16 +1,6 @@
 import Foundation
 import UIKit
 
-extension UIColor {
-    var coreImageColor: CIColor {
-        return CIColor(color: self)
-    }
-    var components: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-        let coreImageColor = self.coreImageColor
-        return (coreImageColor.red, coreImageColor.green, coreImageColor.blue, coreImageColor.alpha)
-    }
-}
-
 public struct PixelData: CustomStringConvertible {
     var a: UInt8 = 0
     var r: UInt8 = 0
@@ -53,10 +43,10 @@ public struct PixelData: CustomStringConvertible {
         return UInt8(x * 255)
     }
     
-    public static func gradientPixel(depth: Double, start: UIColor, finish: UIColor) -> PixelData {
-        let r = interporlate(between: start.components.red, and: finish.components.red, value: CGFloat(depth))
-        let g = interporlate(between: start.components.green, and: finish.components.green, value: CGFloat(depth))
-        let b = interporlate(between: start.components.blue, and: finish.components.blue, value: CGFloat(depth))
+    public static func gradientPixel(depth: Double, start: ColorComponents, finish: ColorComponents) -> PixelData {
+        let r = interporlate(between: start.red, and: finish.red, value: CGFloat(depth))
+        let g = interporlate(between: start.green, and: finish.green, value: CGFloat(depth))
+        let b = interporlate(between: start.blue, and: finish.blue, value: CGFloat(depth))
         
         return PixelData.init(a: 255, r: r, g: g, b: b)
     }
@@ -159,13 +149,16 @@ public struct Graph {
 
 }
 
+let startColorComponents = UIColor.black.components
+let finishColorComponents = UIColor.purple.components
+
 public var bigGraph = Graph.init(width: 5000, height: 5000,
                                         centre: CGPoint(x: -0.7464, y: 0.1101),
                                         scale: CGFloat(0.0003)
 ) { point in
     return PixelData.gradientPixel(
         depth: 1 - isMandelbrot(point),
-        start: UIColor.black,
-        finish: UIColor.purple)
+        start: startColorComponents,
+        finish: finishColorComponents)
 }
 

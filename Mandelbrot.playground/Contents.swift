@@ -31,14 +31,17 @@ greyGraph.calculate()
  A very pretty subsection of the graph with special colouring. Also available, 'coolPixel', 'greyPixel' and 'gradientPixel'.
  */
 
+let startColorComponents = UIColor.blue.components
+let finishColorComponents = UIColor.orange.components
+
 var colourGraph = Graph.init(width: 500, height: 500,
     centre: CGPoint(x: -0.7463, y: 0.1102),
     scale: CGFloat(0.005)
 ) { point in
     return PixelData.gradientPixel(
         depth: 1 - isMandelbrot(point),
-        start: UIColor.blue,
-        finish: UIColor.orange)
+        start: startColorComponents,
+        finish: finishColorComponents)
 }
 
 colourGraph.calculate()
